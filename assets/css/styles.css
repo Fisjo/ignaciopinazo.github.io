@@ -1,81 +1,95 @@
-/* ---------- General ---------- */
-body {
-  background-color: #f4f4f4;
-  font-family: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+/* ---------- GENERAL LAYOUT ---------- */
+html, body {
+  height: 100%;
   margin: 0;
-  padding-top: 70px; /* espacio para la navbar fija */
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  background-color: #f4f4f4;
   display: flex;
   flex-direction: column;
-  min-height: 100vh;
 }
 
-/* ---------- Hero section ---------- */
+/* ---------- NAVBAR ---------- */
+.navbar {
+  flex-shrink: 0;
+}
+
+/* ---------- HERO SECTION WITH BACKGROUND ---------- */
 .hero {
-  flex: 1; /* hace que el footer se mantenga abajo */
+  position: relative;
+  flex: 1;
+  min-height: 100vh;
+  background-image: url("../images/FinanceBackground.jpg");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 4rem 0;
+  text-align: center;
+  color: #fff;
+  overflow: hidden;
 }
 
+/* capa oscura sobre la imagen */
+.hero .overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.55);
+  z-index: 0;
+}
+
+/* contenido del hero */
 .hero .container {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 2rem;
-  flex-wrap: wrap;
+  position: relative;
+  z-index: 2; /* esto asegura que el texto esté por encima de la capa oscura */
 }
 
-/* ---------- Texto ---------- */
+/* textos */
 .hero h1 {
   font-weight: 700;
   margin-bottom: 1rem;
 }
 
-.hero p.lead {
+.hero p {
   font-size: 1.1rem;
-  color: #555;
+  font-weight: 400;
+  color: #e2e2e2;
 }
 
-/* ---------- Avatar ---------- */
-.avatar {
-  width: 220px;
-  height: 220px;
-  border-radius: 50%;
-  object-fit: cover;
-  border: 5px solid white;
-  box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
-  transition: transform 0.2s ease;
+/* botones */
+.hero .btn-light {
+  color: #000;
 }
 
-.avatar:hover {
-  transform: scale(1.05);
+.hero .btn-outline-light {
+  border-width: 2px;
+  color: #fff;
 }
 
-/* Responsive para pantallas pequeñas */
+/* ---------- RESPONSIVE ---------- */
 @media (max-width: 768px) {
-  .hero .container {
-    flex-direction: column-reverse;
-    text-align: center;
+  .hero {
+    padding: 6rem 1rem;
   }
 
-  .avatar {
-    width: 160px;
-    height: 160px;
-    margin-top: 2rem;
+  .hero h1 {
+    font-size: 2rem;
+  }
+
+  .hero p {
+    font-size: 1rem;
   }
 }
 
-/* ---------- Footer ---------- */
+/* ---------- FOOTER ---------- */
 footer {
+  flex-shrink: 0;
   background-color: #212529;
   color: #ccc;
   text-align: center;
   padding: 1rem 0;
-  margin-top: auto; /* fuerza el footer al fondo */
   font-size: 0.9rem;
-}
-
-footer p {
-  margin: 0;
 }

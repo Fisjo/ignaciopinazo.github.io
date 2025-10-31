@@ -1,17 +1,18 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>About | Ignacio Pinazo</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="assets/css/style.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="assets/css/style.css" rel="stylesheet" />
   </head>
-  <body>
-    <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark py-3 fixed-top">
+
+  <body class="d-flex flex-column min-vh-100 bg-light">
+    <!-- NAVBAR -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top shadow-sm">
       <div class="container">
-        <a class="navbar-brand fw-bold" href="index.html">Ignacio Pinazo</a>
+        <a class="navbar-brand fw-bold" href="index.html">Portfolio</a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
           <span class="navbar-toggler-icon"></span>
         </button>
@@ -26,24 +27,39 @@
       </div>
     </nav>
 
-    <main class="container my-5 pt-5">
-      <div class="row align-items-center">
-        <div class="col-md-4 text-center">
-          <img src="assets/images/FotoCarnet.jpg" class="rounded-circle shadow mb-3" width="200">
-        </div>
-        <div class="col-md-8">
-          <h2 class="fw-bold mb-3">About Me</h2>
-          <p>I’m a Computer Science student at <strong>Universidad Politécnica de Valencia (UPV)</strong>, specializing in quantitative finance, data science, and software engineering.</p>
-          <p>Currently part of EY’s R&D department, I focus on developing analytical and data-driven tools that bridge technology with finance.</p>
-          <p>My interests include algorithmic trading, risk modelling, and machine learning applied to market data.</p>
+    <!-- ABOUT SECTION -->
+    <main class="flex-grow-1 d-flex align-items-center justify-content-center text-dark">
+      <div class="container mt-5 pt-5">
+        <div class="row align-items-center">
+          <div class="col-md-4 text-center mb-4 mb-md-0">
+            <img src="assets/images/FotoCarnet.jpg" alt="Ignacio Pinazo" class="img-fluid rounded-circle shadow-sm" width="200">
+          </div>
+          <div class="col-md-8">
+            <h1 class="fw-bold mb-3">About Me</h1>
+            
+            <p class="lead text-secondary">
+              I’m a Computer Engineering student at the Universitat Politècnica de València (UPV) with a strong focus on quantitative finance, data science, and software engineering.
+            </p>
+            <p class="lead text-secondary">
+              My work revolves around applying data-driven analytical and programming skills to real-world financial challenges — particularly in algorithmic trading, risk modelling, and machine learning.
+            </p>
+            <p class="lead text-secondary">
+              I recently completed an internship at Ernst & Young (EY) within the Tax & Quantitative Services (TQS) division, where I contributed to the preparation of technical documentation for innovation projects, performed analytical cost modelling, and supported financial validation processes for clients under Spanish R&D tax frameworks.
+            </p>
+            <p class="lead text-secondary">
+              I’m also an active member of the Software Group at the UPV Investment Club, where we develop and backtest algorithmic trading strategies, research quantitative techniques for portfolio optimization, and participate in student-led finance competitions.
+            </p>
+            <p class="lead text-secondary">
+              I’m passionate about bridging technology, data, and financial markets, continuously learning and building a foundation for a future career in quantitative research and financial engineering.
+            </p>
+          </div>
         </div>
       </div>
     </main>
 
-    <footer class="bg-dark text-center text-light py-3 mt-5">
-      <p class="mb-0">© 2025 Ignacio Pinazo.</p>
+    <!-- FOOTER -->
+    <footer class="bg-dark text-light text-center py-3 mt-auto">
+      <p class="mb-0 small">© 2025 Ignacio Pinazo · Built with Bootstrap 5</p>
     </footer>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-  </body>
-</html>
+    <script src="https://c
