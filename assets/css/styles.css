@@ -1,0 +1,81 @@
+/* ---------- General ---------- */
+body {
+  background-color: #f4f4f4;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  margin: 0;
+  padding-top: 70px; /* espacio para la navbar fija */
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+/* ---------- Hero section ---------- */
+.hero {
+  flex: 1; /* hace que el footer se mantenga abajo */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4rem 0;
+}
+
+.hero .container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 2rem;
+  flex-wrap: wrap;
+}
+
+/* ---------- Texto ---------- */
+.hero h1 {
+  font-weight: 700;
+  margin-bottom: 1rem;
+}
+
+.hero p.lead {
+  font-size: 1.1rem;
+  color: #555;
+}
+
+/* ---------- Avatar ---------- */
+.avatar {
+  width: 220px;
+  height: 220px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 5px solid white;
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+  transition: transform 0.2s ease;
+}
+
+.avatar:hover {
+  transform: scale(1.05);
+}
+
+/* Responsive para pantallas pequeñas */
+@media (max-width: 768px) {
+  .hero .container {
+    flex-direction: column-reverse;
+    text-align: center;
+  }
+
+  .avatar {
+    width: 160px;
+    height: 160px;
+    margin-top: 2rem;
+  }
+}
+
+/* ---------- Footer ---------- */
+footer {
+  background-color: #212529;
+  color: #ccc;
+  text-align: center;
+  padding: 1rem 0;
+  margin-top: auto; /* fuerza el footer al fondo */
+  font-size: 0.9rem;
+}
+
+footer p {
+  margin: 0;
+}
