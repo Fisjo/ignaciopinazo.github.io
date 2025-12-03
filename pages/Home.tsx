@@ -43,7 +43,7 @@ export const Home: React.FC = () => {
               <ArrowRight className="ml-2 -mr-1" size={20} />
             </Link>
             <a 
-              href="https://drive.google.com/file/d/1phcSBcXq7VsSsUGEGWR9_3_Ac9bP2zX7/view?usp=drive_link" 
+              href="/ignaciopinazo.github.io/IgnacioPinazoCV_ENG.pdf" 
               target="_blank"
               className="inline-flex items-center justify-center px-8 py-3 border border-slate-300 dark:border-slate-700 text-base font-medium rounded-lg text-slate-700 dark:text-slate-200 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 md:py-4 md:text-lg transition-all"
             >
