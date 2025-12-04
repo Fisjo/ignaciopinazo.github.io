@@ -1,20 +1,44 @@
-<div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
-</div>
+# 📈 Ignacio Pinazo | Quantitative Finance & Engineering Portfolio
 
-# Run and deploy your AI Studio app
+[![Demo en Vivo](https://img.shields.io/badge/Demo%20en%20Vivo-ACCC00?style=for-the-badge&logo=vercel&logoColor=white)](https://fisjo.github.io/ignaciopinazo.github.io/)
+[![Construido con](https://img.shields.io/badge/Vite-646CFF?style=for-the-badge&logo=vite&logoColor=white)](https://vitejs.dev/)
+[![Estilo](https://img.shields.io/badge/Tailwind_CSS-06B6D4?style=for-the-badge&logo=tailwindcss&logoColor=white)](https://tailwindcss.com/)
 
-This contains everything you need to run your app locally.
+---
 
-View your app in AI Studio: https://ai.studio/apps/drive/1MBDPGpZWl3PiUCrYBUVlk73y9fo6TKGE
+## Resumen del Proyecto
 
-## Run Locally
+Este repositorio alberga mi porfolio personal, una plataforma que he desarrollado para proyectar mi expertise y mis capacidades en Ingeniería Informática y Finanzas Cuantitativas.
 
-**Prerequisites:**  Node.js
+Mi principal objetivo es simple: mostrar mis proyectos para demostrar mi interés genuino en Ingeniería Informática y Finanzas Cuantitativas. He procurado que el sitio web sea no solo funcional, sino que también presente un diseño moderno, responsivo y visualmente atractivo, reflejando mi forma de diseñar y trabajar. 
 
+### Características Principales
 
-1. Install dependencies:
-   `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
-3. Run the app:
-   `npm run dev`
+* **About:** Sección dedicada a información educativa y personal
+* **Projects:** Sección dedicada a mostrar proyectos personales.
+* **Contact:** Sección dedicada a agenda de reuniones o mail junto con información de contacto
+* **Modo Oscuro/Claro:** Alternancia de tema persistente implementada con Tailwind CSS.
+
+---
+
+## Tecnologías Empleadas
+
+El portafolio está construido con un *stack* de desarrollo moderno y eficiente, asegurando velocidad y escalabilidad.
+
+### Frontend & Core
+| Categoría | Tecnología | 
+| :--- | :--- |
+| **Framework Principal** | **React.js** |
+| **Lenguaje** | **TypeScript** |
+| **Estilizado** | **Tailwind CSS** |
+| **Visualización** | **Recharts** |
+| **Íconos** | **Lucide React** |
+
+### Herramientas de Desarrollo y Despliegue
+| Categoría | Tecnología | Uso |
+| :--- | :--- | :--- |
+| **Compilador/Servidor** | **Vite** | Utilizado como herramienta de *build* y servidor de desarrollo, conocido por su velocidad. |
+| **Rutas** | **React Router DOM** | Maneja el enrutamiento de la SPA (utilizando `HashRouter` para compatibilidad con *static hosting* como GitHub Pages). |
+| **Despliegue** | **GitHub Pages** | Hosting estático para el sitio de producción. |
+
+---
