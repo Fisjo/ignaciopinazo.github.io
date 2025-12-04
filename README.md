@@ -1,10 +1,13 @@
-# 📈 Ignacio Pinazo | Quantitative Finance & Engineering Portfolio
+# Ignacio Pinazo | Quantitative Finance & Engineering Portfolio
 
 [![Demo en Vivo](https://img.shields.io/badge/Demo%20en%20Vivo-ACCC00?style=for-the-badge&logo=vercel&logoColor=white)](https://fisjo.github.io/ignaciopinazo.github.io/)
 [![Construido con](https://img.shields.io/badge/Vite-646CFF?style=for-the-badge&logo=vite&logoColor=white)](https://vitejs.dev/)
 [![Estilo](https://img.shields.io/badge/Tailwind_CSS-06B6D4?style=for-the-badge&logo=tailwindcss&logoColor=white)](https://tailwindcss.com/)
 
 ---
+
+## Enlace
+Link a la página web: `https://fisjo.github.io/ignaciopinazo.github.io/`
 
 ## Resumen del Proyecto
 
