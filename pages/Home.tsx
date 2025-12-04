@@ -15,7 +15,7 @@ export const Home: React.FC = () => {
         <div className="text-center max-w-4xl mx-auto">
           <div className="inline-flex items-center px-3 py-1 rounded-full border border-indigo-200 dark:border-indigo-900 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-300 text-sm font-medium mb-6">
             <span className="flex h-2 w-2 rounded-full bg-indigo-500 mr-2 animate-ping"></span>
-            Open to opportunities in Quantitative Finance
+            Open to new opportunities
           </div>
           
           <h1 className="text-5xl md:text-7xl font-extrabold text-slate-900 dark:text-white tracking-tight mb-6">

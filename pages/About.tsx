@@ -22,7 +22,7 @@ export const About: React.FC = () => {
                 My work revolves around applying data-driven analytical and programming skills to real-world financial challenges. I particularly enjoy <span className="underline decoration-indigo-500 decoration-2 underline-offset-2">algorithmic trading</span>, financial derivatives, and machine learning.
               </p>
               <p>
-                Currently, I am an active member of the Software Group at the UPV Investment Club, developing backtesting frameworks and researching portfolio optimization techniques.
+                Currently, I am an active member of the Software Group at the UPV Investment Club, developing backtesting strategies and researching portfolio optimization techniques.
               </p>
             </div>
           </section>
