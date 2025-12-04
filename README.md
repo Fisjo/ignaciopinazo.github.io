@@ -7,7 +7,7 @@
 ---
 
 ## Enlace
-Link a la página web: `https://fisjo.github.io/ignaciopinazo.github.io/`
+Link a la página web: https://fisjo.github.io/ignaciopinazo.github.io/
 
 ## Resumen del Proyecto
 
