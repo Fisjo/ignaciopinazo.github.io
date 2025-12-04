@@ -8,22 +8,22 @@
 
 ## Resumen del Proyecto
 
-Este repositorio aloja el código fuente del portafolio profesional de Ignacio Pinazo, diseñado para mostrar experiencia y proyectos en la intersección de la **Ingeniería Informática** y las **Finanzas Cuantitativas** (Quantitative Finance).
+Este repositorio alberga mi porfolio personal, una plataforma que he desarrollado para proyectar mi expertise y mis capacidades en Ingeniería Informática y Finanzas Cuantitativas.
 
-El sitio presenta un diseño moderno, responsivo y visualmente limpio, enfocado en destacar el *expertise* en modelado financiero, desarrollo de algoritmos de *trading*, y análisis de datos.
+Mi principal objetivo es simple: mostrar mis proyectos para demostrar mi interés genuino en Ingeniería Informática y Finanzas Cuantitativas. He procurado que el sitio web sea no solo funcional, sino que también presente un diseño moderno, responsivo y visualmente atractivo, reflejando mi forma de diseñar y trabajar. 
 
 ### Características Principales
 
 * **About:** Sección dedicada a información educativa y personal
 * **Projects:** Sección dedicada a mostrar proyectos personales.
+* **Contact:** Sección dedicada a agenda de reuniones o mail junto con información de contacto
 * **Modo Oscuro/Claro:** Alternancia de tema persistente implementada con Tailwind CSS.
-* **Visualización de Datos:** Integración con librerías de gráficos para mostrar resultados simulados de estrategias (p. ej., estrategias de momentum).
 
 ---
 
 ## Tecnologías Empleadas
 
-El portafolio está construido con un *stack* de desarrollo moderno y altamente eficiente, asegurando velocidad, mantenibilidad y escalabilidad.
+El portafolio está construido con un *stack* de desarrollo moderno y eficiente, asegurando velocidad y escalabilidad.
 
 ### Frontend & Core
 | Categoría | Tecnología | 
