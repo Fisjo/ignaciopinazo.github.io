@@ -1,0 +1,871 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ignacio Pinazo — Engineering Alpha | ML × Quantitative Finance</title>
+  <meta name="description" content="Ignacio Pinazo Orihuela — Computer Science engineer (UPV) specialized in machine learning applied to quantitative finance. ML stock-picking research, walk-forward validated backtests, systematic strategies." />
+  <meta name="author" content="Ignacio Pinazo Orihuela" />
+  <meta name="theme-color" content="#050505" />
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="Ignacio Pinazo — Engineering Alpha" />
+  <meta property="og:description" content="Machine learning × quantitative finance. ML stock-picking engine on the S&P 500, validated with walk-forward backtesting and statistical inference." />
+  <meta property="og:locale" content="en_US" />
+  <meta property="og:locale:alternate" content="es_ES" />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%23050505'/%3E%3Ctext x='16' y='22' font-family='monospace' font-size='15' fill='%2310b981' text-anchor='middle' font-weight='bold'%3EIP%3C/text%3E%3C/svg%3E" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            ink: '#050505',
+            surface: '#0a0a0a',
+            panel: '#0d0f0e',
+            edge: '#1c1f1d',
+            mute: '#a1a1aa',
+            faint: '#52525b',
+            accent: { DEFAULT: '#10b981', bright: '#34d399', neon: '#00ff88', dim: '#064e3b' }
+          },
+          fontFamily: {
+            sans: ['Inter', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'ui-monospace', 'SFMono-Regular', 'monospace']
+          },
+          maxWidth: { wrap: '72rem' }
+        }
+      }
+    };
+  </script>
+
+  <style>
+    :root { color-scheme: dark; }
+    body { font-family: 'Inter', sans-serif; background: #050505; }
+
+    /* ---- Technical grid overlay + radial glow ---- */
+    .grid-bg {
+      background-image:
+        linear-gradient(rgba(16, 185, 129, 0.045) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(16, 185, 129, 0.045) 1px, transparent 1px);
+      background-size: 56px 56px;
+      mask-image: radial-gradient(ellipse 90% 70% at 50% 0%, black 35%, transparent 100%);
+      -webkit-mask-image: radial-gradient(ellipse 90% 70% at 50% 0%, black 35%, transparent 100%);
+    }
+    .hero-glow {
+      background: radial-gradient(ellipse 55% 45% at 50% 8%, rgba(16, 185, 129, 0.10), transparent 70%);
+    }
+
+    /* ---- Scroll reveal ---- */
+    .reveal { opacity: 0; transform: translateY(22px); transition: opacity .7s cubic-bezier(.21,.6,.35,1), transform .7s cubic-bezier(.21,.6,.35,1); }
+    .reveal.visible { opacity: 1; transform: none; }
+
+    /* ---- Terminal ---- */
+    .term-cursor { display: inline-block; width: .55em; height: 1.05em; background: #00ff88; vertical-align: text-bottom; animation: blink 1.05s step-end infinite; }
+    @keyframes blink { 50% { opacity: 0; } }
+
+    /* ---- Live dot ---- */
+    .live-dot { position: relative; }
+    .live-dot::after { content: ''; position: absolute; inset: -4px; border-radius: 9999px; border: 1px solid rgba(0,255,136,.5); animation: ping 1.8s cubic-bezier(0,0,.2,1) infinite; }
+    @keyframes ping { 80%, 100% { transform: scale(2.1); opacity: 0; } }
+
+    /* ---- Pipeline connector ---- */
+    .pipe-line { background: linear-gradient(90deg, rgba(16,185,129,.0), rgba(16,185,129,.55), rgba(16,185,129,.0)); }
+    .pipe-node:hover .pipe-num { color: #00ff88; border-color: rgba(0,255,136,.55); box-shadow: 0 0 22px rgba(16,185,129,.25); }
+
+    /* ---- Cards ---- */
+    .card-hover { transition: border-color .3s ease, transform .3s ease, box-shadow .3s ease; }
+    .card-hover:hover { border-color: rgba(16,185,129,.45); transform: translateY(-3px); box-shadow: 0 18px 50px -22px rgba(16,185,129,.22); }
+
+    /* ---- Buttons ---- */
+    .btn-primary { transition: all .3s ease; box-shadow: 0 0 0 0 rgba(16,185,129,0); }
+    .btn-primary:hover { box-shadow: 0 0 34px -6px rgba(16,185,129,.55); transform: translateY(-1px); }
+    .btn-ghost { transition: all .3s ease; }
+    .btn-ghost:hover { border-color: rgba(16,185,129,.6); color: #34d399; transform: translateY(-1px); }
+
+    /* ---- Language switch ---- */
+    .lang-btn { transition: all .25s ease; }
+    .lang-btn[aria-pressed="true"] { background: rgba(16,185,129,.14); color: #34d399; }
+    .lang-btn[aria-pressed="false"] { color: #52525b; }
+    .lang-btn[aria-pressed="false"]:hover { color: #a1a1aa; }
+
+    /* ---- Marquee ticker ---- */
+    .ticker-track { display: flex; gap: 3.5rem; width: max-content; animation: ticker 38s linear infinite; }
+    @keyframes ticker { to { transform: translateX(-50%); } }
+
+    a:focus-visible, button:focus-visible { outline: 2px solid #34d399; outline-offset: 3px; border-radius: 4px; }
+    ::selection { background: rgba(16,185,129,.35); color: #fff; }
+
+    @media (prefers-reduced-motion: reduce) {
+      .reveal { opacity: 1 !important; transform: none !important; transition: none !important; }
+      .ticker-track, .live-dot::after, .term-cursor { animation: none !important; }
+      html { scroll-behavior: auto; }
+    }
+  </style>
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Person",
+    "name": "Ignacio Pinazo Orihuela",
+    "jobTitle": "Computer Science Engineer — AI & Quantitative Finance",
+    "affiliation": { "@type": "CollegeOrUniversity", "name": "Universitat Politècnica de València" },
+    "email": "mailto:ignacio.po.ipo@gmail.com",
+    "address": { "@type": "PostalAddress", "addressLocality": "Valencia", "addressCountry": "ES" },
+    "sameAs": [
+      "https://github.com/Fisjo",
+      "https://www.linkedin.com/in/ignacio-pinazo-orihuela-143539288/",
+      "https://substack.com/@nachopinazo"
+    ]
+  }
+  </script>
+</head>
+
+<body class="bg-ink text-zinc-100 antialiased overflow-x-hidden">
+
+  <!-- ================= HEADER ================= -->
+  <header class="fixed top-0 inset-x-0 z-50 border-b border-edge/80 bg-ink/75 backdrop-blur-xl">
+    <nav class="max-w-wrap mx-auto px-5 sm:px-8 h-16 flex items-center justify-between" aria-label="Main navigation">
+      <a href="#top" class="flex items-center gap-3 group" aria-label="Ignacio Pinazo — home">
+        <span class="font-mono text-sm font-bold text-accent-bright border border-accent/40 rounded px-2 py-1 group-hover:border-accent-neon group-hover:text-accent-neon transition-all duration-300">IP_</span>
+        <span class="font-semibold tracking-tight text-sm hidden sm:block">Ignacio Pinazo</span>
+      </a>
+
+      <div class="hidden md:flex items-center gap-8 font-mono text-[13px] text-mute">
+        <a href="#research" class="hover:text-accent-bright transition-colors duration-300" data-i18n="nav_research">Research</a>
+        <a href="#projects" class="hover:text-accent-bright transition-colors duration-300" data-i18n="nav_projects">Projects</a>
+        <a href="#writing" class="hover:text-accent-bright transition-colors duration-300" data-i18n="nav_writing">Writing</a>
+        <a href="#contact" class="hover:text-accent-bright transition-colors duration-300" data-i18n="nav_contact">Contact</a>
+      </div>
+
+      <div class="flex items-center gap-4">
+        <div class="flex items-center font-mono text-xs border border-edge rounded-md overflow-hidden" role="group" aria-label="Language selector">
+          <button id="lang-en" class="lang-btn px-2.5 py-1.5" aria-pressed="true" onclick="setLang('en')">EN</button>
+          <span class="text-faint select-none" aria-hidden="true">/</span>
+          <button id="lang-es" class="lang-btn px-2.5 py-1.5" aria-pressed="false" onclick="setLang('es')">ES</button>
+        </div>
+        <a href="./IgnacioPinazoCV_ENG.pdf" target="_blank" rel="noopener" class="btn-ghost hidden sm:inline-flex font-mono text-xs border border-edge text-mute rounded-md px-3 py-1.5" data-i18n="nav_cv">CV ↓</a>
+      </div>
+    </nav>
+  </header>
+
+  <main id="top">
+
+    <!-- ================= HERO ================= -->
+    <section class="relative pt-32 sm:pt-40 pb-16 hero-glow" aria-label="Introduction">
+      <div class="absolute inset-0 grid-bg pointer-events-none" aria-hidden="true"></div>
+
+      <div class="relative max-w-wrap mx-auto px-5 sm:px-8">
+        <div class="grid lg:grid-cols-[1.15fr_.85fr] gap-12 lg:gap-10 items-center">
+
+          <!-- Left: statement -->
+          <div>
+            <p class="flex items-center gap-2.5 font-mono text-xs text-accent-bright mb-7 reveal">
+              <span class="live-dot w-2 h-2 rounded-full bg-accent-neon inline-block" aria-hidden="true"></span>
+              <span data-i18n="hero_status">OPEN TO QUANT / ML OPPORTUNITIES — 2026</span>
+            </p>
+
+            <h1 class="text-4xl sm:text-6xl font-extrabold tracking-tight leading-[1.04] mb-6 reveal" style="transition-delay:.08s">
+              <span data-i18n="hero_h1a">Engineering</span>
+              <span class="text-accent-bright" data-i18n="hero_h1b">Alpha</span><span class="text-accent-neon">.</span><br />
+              <span class="text-zinc-400 text-2xl sm:text-4xl font-semibold tracking-tight" data-i18n="hero_h1c">Where machine learning meets quantitative finance.</span>
+            </h1>
+
+            <p class="text-mute max-w-xl leading-relaxed mb-9 reveal" style="transition-delay:.16s" data-i18n="hero_sub">
+              Computer Science engineer at Universitat Politècnica de València (UPV), specialized in AI applied to financial markets. I build end-to-end systematic strategies: data pipelines, supervised ranking models and statistically validated backtests.
+            </p>
+
+            <div class="flex flex-wrap items-center gap-3.5 reveal" style="transition-delay:.24s">
+              <a href="https://github.com/Fisjo" target="_blank" rel="noopener" class="btn-primary inline-flex items-center gap-2 bg-accent text-ink font-semibold text-sm rounded-md px-5 py-3">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 .5C5.65.5.5 5.65.5 12c0 5.08 3.29 9.39 7.86 10.91.58.11.79-.25.79-.56v-1.97c-3.2.7-3.87-1.54-3.87-1.54-.52-1.33-1.28-1.68-1.28-1.68-1.04-.71.08-.7.08-.7 1.15.08 1.76 1.18 1.76 1.18 1.03 1.76 2.69 1.25 3.34.96.1-.74.4-1.25.73-1.54-2.55-.29-5.23-1.28-5.23-5.68 0-1.26.45-2.28 1.18-3.09-.12-.29-.51-1.46.11-3.05 0 0 .96-.31 3.15 1.18a10.9 10.9 0 0 1 5.74 0c2.19-1.49 3.15-1.18 3.15-1.18.62 1.59.23 2.76.11 3.05.73.81 1.18 1.83 1.18 3.09 0 4.41-2.69 5.38-5.25 5.67.41.35.78 1.05.78 2.12v3.14c0 .31.21.68.8.56A10.52 10.52 0 0 0 23.5 12C23.5 5.65 18.35.5 12 .5Z"/></svg>
+                <span data-i18n="hero_cta_gh">View projects</span>
+              </a>
+              <a href="https://substack.com/@nachopinazo" target="_blank" rel="noopener" class="btn-ghost inline-flex items-center gap-2 border border-edge text-zinc-200 font-medium text-sm rounded-md px-5 py-3">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M22.54 8.42H1.46v2.84h21.08V8.42ZM1.46 13.21V24L12 18.11 22.54 24V13.21H1.46ZM22.54 3.63H1.46v2.84h21.08V3.63Z"/></svg>
+                <span data-i18n="hero_cta_ss">Read research</span>
+              </a>
+              <a href="https://www.linkedin.com/in/ignacio-pinazo-orihuela-143539288/" target="_blank" rel="noopener" aria-label="LinkedIn — Ignacio Pinazo" class="btn-ghost inline-flex items-center justify-center border border-edge text-zinc-300 rounded-md w-11 h-11">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20.45 20.45h-3.55v-5.57c0-1.33-.03-3.04-1.85-3.04-1.85 0-2.14 1.45-2.14 2.94v5.67H9.36V9h3.41v1.56h.05c.47-.9 1.63-1.85 3.36-1.85 3.6 0 4.27 2.37 4.27 5.45v6.29ZM5.34 7.43a2.06 2.06 0 1 1 0-4.12 2.06 2.06 0 0 1 0 4.12ZM7.12 20.45H3.55V9h3.57v11.45Z"/></svg>
+              </a>
+            </div>
+          </div>
+
+          <!-- Right: terminal readout -->
+          <div class="reveal" style="transition-delay:.2s">
+            <div class="rounded-lg border border-edge bg-surface shadow-2xl shadow-black/60 overflow-hidden" role="img" aria-label="Terminal output showing backtest results: net Sharpe 0.81, annualized net return +17.2%, permutation p-value 0.000">
+              <div class="flex items-center gap-2 px-4 py-3 border-b border-edge bg-panel">
+                <span class="w-2.5 h-2.5 rounded-full bg-zinc-700" aria-hidden="true"></span>
+                <span class="w-2.5 h-2.5 rounded-full bg-zinc-700" aria-hidden="true"></span>
+                <span class="w-2.5 h-2.5 rounded-full bg-accent-dim" aria-hidden="true"></span>
+                <span class="ml-3 font-mono text-[11px] text-faint">research@upv — backtest.py</span>
+              </div>
+              <pre id="terminal" class="font-mono text-[12.5px] sm:text-[13px] leading-[1.85] text-zinc-300 px-5 py-5 min-h-[290px] whitespace-pre-wrap" aria-hidden="true"></pre>
+            </div>
+            <p class="font-mono text-[11px] text-faint mt-3 text-right" data-i18n="hero_term_note">// real metrics — bachelor thesis, walk-forward backtest 2016–2024</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Ticker strip -->
+      <div class="relative mt-16 border-y border-edge bg-surface/60 overflow-hidden py-3" aria-hidden="true">
+        <div class="ticker-track font-mono text-xs text-faint" id="ticker"></div>
+      </div>
+    </section>
+
+    <!-- ================= FEATURED RESEARCH (TFG) ================= -->
+    <section id="research" class="relative py-24 sm:py-28 scroll-mt-16" aria-labelledby="research-title">
+      <div class="max-w-wrap mx-auto px-5 sm:px-8">
+
+        <p class="font-mono text-xs text-accent-bright mb-4 reveal"><span class="text-faint">01 //</span> <span data-i18n="res_label">FEATURED RESEARCH — BACHELOR THESIS (UPV)</span></p>
+        <div class="grid lg:grid-cols-[1fr_.55fr] gap-8 items-end mb-14">
+          <h2 id="research-title" class="text-3xl sm:text-5xl font-bold tracking-tight leading-tight reveal" style="transition-delay:.06s" data-i18n="res_title">
+            An ML stock-picking engine for the S&amp;P 500.
+          </h2>
+          <p class="text-mute leading-relaxed reveal" style="transition-delay:.12s" data-i18n="res_sub">
+            A supervised cross-sectional ranking system: XGBoost trained on liquidity, volatility and reversal signals to identify relative outperformers — audited under a realistic transaction-cost model.
+          </p>
+        </div>
+
+        <!-- Validation pipeline -->
+        <div class="relative mb-16 reveal" style="transition-delay:.1s">
+          <h3 class="font-mono text-xs text-faint uppercase tracking-widest mb-8" data-i18n="res_pipe_title">// Validation pipeline</h3>
+          <div class="hidden lg:block absolute top-[5.6rem] left-[6%] right-[6%] h-px pipe-line" aria-hidden="true"></div>
+          <ol class="grid sm:grid-cols-2 lg:grid-cols-5 gap-4">
+            <li class="pipe-node group rounded-lg border border-edge bg-surface p-5 card-hover">
+              <span class="pipe-num inline-flex items-center justify-center w-9 h-9 rounded-md border border-edge font-mono text-xs text-accent-bright bg-ink mb-4 transition-all duration-300">01</span>
+              <h4 class="font-semibold text-sm mb-2" data-i18n="pipe1_t">Data Ingestion</h4>
+              <p class="text-[13px] text-mute leading-relaxed" data-i18n="pipe1_d">505 S&amp;P 500 tickers · 20 years of OHLCV · automated cleaning, gap repair &amp; survivorship checks.</p>
+            </li>
+            <li class="pipe-node group rounded-lg border border-edge bg-surface p-5 card-hover">
+              <span class="pipe-num inline-flex items-center justify-center w-9 h-9 rounded-md border border-edge font-mono text-xs text-accent-bright bg-ink mb-4 transition-all duration-300">02</span>
+              <h4 class="font-semibold text-sm mb-2" data-i18n="pipe2_t">Feature Engineering</h4>
+              <p class="text-[13px] text-mute leading-relaxed" data-i18n="pipe2_d">Vectorized feature store: Amihud illiquidity, Garman-Klass &amp; idiosyncratic volatility, short-term reversal, momentum, VIX regime. No-leakage verified.</p>
+            </li>
+            <li class="pipe-node group rounded-lg border border-edge bg-surface p-5 card-hover">
+              <span class="pipe-num inline-flex items-center justify-center w-9 h-9 rounded-md border border-edge font-mono text-xs text-accent-bright bg-ink mb-4 transition-all duration-300">03</span>
+              <h4 class="font-semibold text-sm mb-2" data-i18n="pipe3_t">Walk-Forward Training</h4>
+              <p class="text-[13px] text-mute leading-relaxed" data-i18n="pipe3_d">GPU XGBoost vs Ridge baseline · Optuna tuning on IC-IR · expanding window, 9 folds with 5-day purge &amp; embargo.</p>
+            </li>
+            <li class="pipe-node group rounded-lg border border-edge bg-surface p-5 card-hover">
+              <span class="pipe-num inline-flex items-center justify-center w-9 h-9 rounded-md border border-edge font-mono text-xs text-accent-bright bg-ink mb-4 transition-all duration-300">04</span>
+              <h4 class="font-semibold text-sm mb-2" data-i18n="pipe4_t">Backtesting Engine</h4>
+              <p class="text-[13px] text-mute leading-relaxed" data-i18n="pipe4_d">7 incremental portfolio constructions (S0→S6) · dollar-neutral · Amihud-calibrated slippage + commissions · 2,269 trading days.</p>
+            </li>
+            <li class="pipe-node group rounded-lg border border-edge bg-surface p-5 card-hover">
+              <span class="pipe-num inline-flex items-center justify-center w-9 h-9 rounded-md border border-edge font-mono text-xs text-accent-bright bg-ink mb-4 transition-all duration-300">05</span>
+              <h4 class="font-semibold text-sm mb-2" data-i18n="pipe5_t">Statistical Validation</h4>
+              <p class="text-[13px] text-mute leading-relaxed" data-i18n="pipe5_d">10,000-sample bootstrap (95% CI &gt; 0) · permutation test (p = 0.000) · cost &amp; parameter sensitivity · sub-period stability.</p>
+            </li>
+          </ol>
+        </div>
+
+        <!-- Chart + metrics -->
+        <div class="grid lg:grid-cols-[1.5fr_1fr] gap-6">
+          <figure class="rounded-lg border border-edge bg-surface p-5 sm:p-7 reveal" style="transition-delay:.08s">
+            <div class="flex flex-wrap items-center justify-between gap-4 mb-6">
+              <figcaption>
+                <h3 class="font-semibold text-sm" data-i18n="chart_title">Net cumulative performance — strategy S6 vs S&amp;P 500</h3>
+                <p class="font-mono text-[11px] text-faint mt-1" data-i18n="chart_period">2016 – 2024 · net of transaction costs</p>
+              </figcaption>
+              <div class="flex font-mono text-xs border border-edge rounded-md overflow-hidden" role="tablist" aria-label="Chart selector">
+                <button id="tab-equity" role="tab" aria-selected="true" class="px-3.5 py-2 bg-accent/10 text-accent-bright transition-all duration-300" onclick="showChart('equity')" data-i18n="chart_tab_eq">Equity curve</button>
+                <button id="tab-dd" role="tab" aria-selected="false" class="px-3.5 py-2 text-faint hover:text-mute transition-all duration-300" onclick="showChart('dd')" data-i18n="chart_tab_dd">Drawdown</button>
+              </div>
+            </div>
+            <div class="relative h-[300px] sm:h-[340px]">
+              <canvas id="perfChart" role="img" aria-label="Line chart comparing the cumulative net return of strategy S6 against the S&P 500 benchmark from 2016 to 2024"></canvas>
+            </div>
+            <p class="font-mono text-[10.5px] text-faint mt-4 leading-relaxed" data-i18n="chart_foot">* Illustrative monthly reconstruction anchored to the thesis backtest results (net Sharpe 0.81 · +17.2% ann. · max DD −34.3%). Full methodology in the thesis.</p>
+          </figure>
+
+          <div class="grid grid-cols-2 gap-4 content-start">
+            <div class="rounded-lg border border-edge bg-surface p-5 card-hover reveal" style="transition-delay:.1s">
+              <p class="font-mono text-[11px] text-faint uppercase tracking-wider mb-2" data-i18n="m1_l">Net Sharpe</p>
+              <p class="font-mono text-3xl font-bold text-accent-bright">0.81</p>
+              <p class="text-[12px] text-mute mt-2" data-i18n="m1_d">1.43 gross — survives a realistic cost model</p>
+            </div>
+            <div class="rounded-lg border border-edge bg-surface p-5 card-hover reveal" style="transition-delay:.16s">
+              <p class="font-mono text-[11px] text-faint uppercase tracking-wider mb-2" data-i18n="m2_l">Ann. net return</p>
+              <p class="font-mono text-3xl font-bold text-accent-bright">+17.2%</p>
+              <p class="text-[12px] text-mute mt-2" data-i18n="m2_d">vs +14.6% for the S&amp;P 500 over the same period</p>
+            </div>
+            <div class="rounded-lg border border-edge bg-surface p-5 card-hover reveal" style="transition-delay:.22s">
+              <p class="font-mono text-[11px] text-faint uppercase tracking-wider mb-2" data-i18n="m3_l">Permutation test</p>
+              <p class="font-mono text-3xl font-bold text-white">p&nbsp;=&nbsp;0.000</p>
+              <p class="text-[12px] text-mute mt-2" data-i18n="m3_d">200 permutations — no random ranking matches the signal</p>
+            </div>
+            <div class="rounded-lg border border-edge bg-surface p-5 card-hover reveal" style="transition-delay:.28s">
+              <p class="font-mono text-[11px] text-faint uppercase tracking-wider mb-2" data-i18n="m4_l">Signal quality</p>
+              <p class="font-mono text-3xl font-bold text-white">+38%</p>
+              <p class="text-[12px] text-mute mt-2" data-i18n="m4_d">IC-IR over the linear baseline (t-stat 3.92, 1.1M predictions)</p>
+            </div>
+            <a href="https://github.com/Fisjo" target="_blank" rel="noopener" class="col-span-2 group rounded-lg border border-accent/30 bg-accent/5 p-5 card-hover reveal flex items-center justify-between" style="transition-delay:.34s">
+              <div>
+                <p class="font-semibold text-sm text-accent-bright" data-i18n="res_cta_t">Explore the full system</p>
+                <p class="text-[12.5px] text-mute mt-1" data-i18n="res_cta_d">Notebooks, feature store and backtesting engine on GitHub</p>
+              </div>
+              <span class="font-mono text-accent-bright text-lg group-hover:translate-x-1.5 transition-transform duration-300" aria-hidden="true">→</span>
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= PROJECTS (BENTO) ================= -->
+    <section id="projects" class="relative py-24 sm:py-28 border-t border-edge scroll-mt-16" aria-labelledby="projects-title">
+      <div class="max-w-wrap mx-auto px-5 sm:px-8">
+        <p class="font-mono text-xs text-accent-bright mb-4 reveal"><span class="text-faint">02 //</span> <span data-i18n="prj_label">PROJECTS &amp; QUANT CODE</span></p>
+        <h2 id="projects-title" class="text-3xl sm:text-5xl font-bold tracking-tight mb-14 reveal" style="transition-delay:.06s" data-i18n="prj_title">Systems, not scripts.</h2>
+
+        <div class="grid md:grid-cols-6 gap-4">
+
+          <!-- Large: TFG engine -->
+          <article class="md:col-span-4 rounded-lg border border-edge bg-surface p-7 card-hover reveal flex flex-col">
+            <div class="flex items-start justify-between gap-4 mb-5">
+              <div>
+                <p class="font-mono text-[11px] text-accent-bright uppercase tracking-wider mb-2" data-i18n="p1_tag">Machine Learning · Thesis</p>
+                <h3 class="text-xl font-bold" data-i18n="p1_t">ML Stock-Picking Engine — S&amp;P 500</h3>
+              </div>
+              <a href="https://github.com/Fisjo" target="_blank" rel="noopener" class="font-mono text-xs text-faint hover:text-accent-bright transition-colors duration-300 shrink-0" aria-label="ML Stock-Picking Engine on GitHub">GitHub ↗</a>
+            </div>
+            <p class="text-[13.5px] text-mute leading-relaxed mb-6 max-w-2xl" data-i18n="p1_d">
+              End-to-end pipeline: automated ingestion of 20 years of data, a vectorized feature store of microstructure signals, XGBoost ranking under walk-forward validation with purge &amp; embargo, and a cost-aware backtesting engine selecting among 7 portfolio constructions.
+            </p>
+            <div class="mt-auto">
+              <div class="flex flex-wrap gap-4 mb-5 font-mono text-[12px]">
+                <span class="text-zinc-300"><span class="text-faint" data-i18n="p1_m1l">Sharpe (net)</span> <span class="text-accent-bright font-bold">0.81</span></span>
+                <span class="text-zinc-300"><span class="text-faint" data-i18n="p1_m2l">Dataset</span> <span class="text-accent-bright font-bold">1.1M rows</span></span>
+                <span class="text-zinc-300"><span class="text-faint" data-i18n="p1_m3l">Avg. cost</span> <span class="text-accent-bright font-bold">5.1 bps</span></span>
+              </div>
+              <div class="flex flex-wrap gap-2 font-mono text-[11px]">
+                <span class="border border-edge rounded px-2 py-1 text-mute">Python</span>
+                <span class="border border-edge rounded px-2 py-1 text-mute">XGBoost</span>
+                <span class="border border-edge rounded px-2 py-1 text-mute">Optuna</span>
+                <span class="border border-edge rounded px-2 py-1 text-mute">Pandas</span>
+                <span class="border border-edge rounded px-2 py-1 text-mute">SHAP</span>
+                <span class="border border-edge rounded px-2 py-1 text-mute">CUDA</span>
+              </div>
+            </div>
+          </article>
+
+          <!-- Status card -->
+          <aside class="md:col-span-2 rounded-lg border border-accent/30 bg-accent/5 p-7 card-hover reveal flex flex-col justify-between" style="transition-delay:.08s">
+            <div>
+              <p class="font-mono text-[11px] text-accent-bright uppercase tracking-wider mb-4" data-i18n="p2_tag">// Status</p>
+              <p class="font-mono text-[13px] leading-[2.1] text-zinc-300">
+                <span class="text-faint">degree:</span> <span data-i18n="p2_deg">CS Engineering, UPV</span><br />
+                <span class="text-faint">focus:</span> <span data-i18n="p2_focus">AI × Quant Finance</span><br />
+                <span class="text-faint">experience:</span> <span data-i18n="p2_exp">EY — Quant Services</span><br />
+                <span class="text-faint">location:</span> Valencia, ES<br />
+                <span class="text-faint">status:</span> <span class="text-accent-neon" data-i18n="p2_status">open_to_work</span>
+              </p>
+            </div>
+            <a href="#contact" class="font-mono text-xs text-accent-bright hover:text-accent-neon transition-colors duration-300 mt-6 inline-block" data-i18n="p2_cta">→ get in touch</a>
+          </aside>
+
+          <!-- Momentum strategy -->
+          <article class="md:col-span-3 rounded-lg border border-edge bg-surface p-7 card-hover reveal" style="transition-delay:.06s">
+            <div class="flex items-start justify-between gap-4 mb-4">
+              <div>
+                <p class="font-mono text-[11px] text-accent-bright uppercase tracking-wider mb-2" data-i18n="p3_tag">Algorithmic Trading</p>
+                <h3 class="text-lg font-bold" data-i18n="p3_t">Multi-Asset Momentum Strategy</h3>
+              </div>
+              <a href="https://github.com/Fisjo" target="_blank" rel="noopener" class="font-mono text-xs text-faint hover:text-accent-bright transition-colors duration-300 shrink-0" aria-label="Momentum strategy on GitHub">GitHub ↗</a>
+            </div>
+            <p class="text-[13.5px] text-mute leading-relaxed mb-5" data-i18n="p3_d">
+              Long-only and market-neutral cross-sectional momentum with monthly rebalancing. Performance audited with Sharpe, Sortino and Calmar ratios against an SPY benchmark.
+            </p>
+            <div class="flex flex-wrap gap-2 font-mono text-[11px]">
+              <span class="border border-edge rounded px-2 py-1 text-mute">Python</span>
+              <span class="border border-edge rounded px-2 py-1 text-mute">Pandas</span>
+              <span class="border border-edge rounded px-2 py-1 text-mute">NumPy</span>
+              <span class="border border-edge rounded px-2 py-1 text-mute">Matplotlib</span>
+            </div>
+          </article>
+
+          <!-- Investment club -->
+          <article class="md:col-span-3 rounded-lg border border-edge bg-surface p-7 card-hover reveal" style="transition-delay:.12s">
+            <p class="font-mono text-[11px] text-accent-bright uppercase tracking-wider mb-2" data-i18n="p4_tag">Research Group</p>
+            <h3 class="text-lg font-bold mb-4" data-i18n="p4_t">UPV Investment Club — Software Group</h3>
+            <p class="text-[13.5px] text-mute leading-relaxed mb-5" data-i18n="p4_d">
+              Developing algorithmic trading strategies and backtesting tooling, studying risk-management models and competing in international quantitative finance competitions.
+            </p>
+            <div class="flex flex-wrap gap-2 font-mono text-[11px]">
+              <span class="border border-edge rounded px-2 py-1 text-mute">Backtesting</span>
+              <span class="border border-edge rounded px-2 py-1 text-mute">Risk Models</span>
+              <span class="border border-edge rounded px-2 py-1 text-mute">Portfolio Optimization</span>
+            </div>
+          </article>
+
+          <!-- Stack strip -->
+          <aside class="md:col-span-6 rounded-lg border border-edge bg-panel px-7 py-5 reveal flex flex-wrap items-center gap-x-8 gap-y-3" style="transition-delay:.16s">
+            <p class="font-mono text-[11px] text-faint uppercase tracking-widest" data-i18n="stack_l">// Arsenal</p>
+            <p class="font-mono text-[12.5px] text-mute leading-relaxed">
+              Python · C++ · Java · TypeScript · SQL <span class="text-accent-dim mx-1">|</span>
+              Pandas · NumPy · Scikit-learn · XGBoost <span class="text-accent-dim mx-1">|</span>
+              <span data-i18n="stack_d">Backtesting · Derivatives · Portfolio Optimization · Linux · Git</span>
+            </p>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= SUBSTACK ================= -->
+    <section id="writing" class="relative py-24 sm:py-28 border-t border-edge scroll-mt-16" aria-labelledby="writing-title">
+      <div class="max-w-wrap mx-auto px-5 sm:px-8">
+        <div class="flex flex-wrap items-end justify-between gap-6 mb-14">
+          <div>
+            <p class="font-mono text-xs text-accent-bright mb-4 reveal"><span class="text-faint">03 //</span> <span data-i18n="wr_label">ALPHA INSIGHTS — RESEARCH NOTES</span></p>
+            <h2 id="writing-title" class="text-3xl sm:text-5xl font-bold tracking-tight reveal" style="transition-delay:.06s" data-i18n="wr_title">I write about what I build.</h2>
+          </div>
+          <a href="https://substack.com/@nachopinazo" target="_blank" rel="noopener" class="btn-primary inline-flex items-center gap-2 bg-accent text-ink font-semibold text-sm rounded-md px-5 py-3 reveal" style="transition-delay:.1s">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M22.54 8.42H1.46v2.84h21.08V8.42ZM1.46 13.21V24L12 18.11 22.54 24V13.21H1.46ZM22.54 3.63H1.46v2.84h21.08V3.63Z"/></svg>
+            <span data-i18n="wr_cta">Subscribe on Substack</span>
+          </a>
+        </div>
+
+        <div class="grid md:grid-cols-3 gap-4">
+          <a href="https://substack.com/@nachopinazo" target="_blank" rel="noopener" class="group rounded-lg border border-edge bg-surface p-7 card-hover reveal flex flex-col">
+            <p class="font-mono text-[11px] text-faint mb-4"><span data-i18n="a1_date">May 2026</span> · <span data-i18n="a1_time">8 min</span></p>
+            <h3 class="font-bold leading-snug mb-3 group-hover:text-accent-bright transition-colors duration-300" data-i18n="a1_t">Turnover kills retail quant strategies — here's the math</h3>
+            <p class="text-[13.5px] text-mute leading-relaxed mb-6" data-i18n="a1_d">Seven portfolio constructions, one lesson: every strategy with turnover above 1.2 died after costs. How EWMA smoothing turned a −0.05 Sharpe into +0.34.</p>
+            <span class="mt-auto font-mono text-xs text-accent-bright" data-i18n="a_read">Read on Substack <span class="inline-block group-hover:translate-x-1 transition-transform duration-300">→</span></span>
+          </a>
+          <a href="https://substack.com/@nachopinazo" target="_blank" rel="noopener" class="group rounded-lg border border-edge bg-surface p-7 card-hover reveal flex flex-col" style="transition-delay:.08s">
+            <p class="font-mono text-[11px] text-faint mb-4"><span data-i18n="a2_date">April 2026</span> · <span data-i18n="a2_time">11 min</span></p>
+            <h3 class="font-bold leading-snug mb-3 group-hover:text-accent-bright transition-colors duration-300" data-i18n="a2_t">Walk-forward with purge &amp; embargo: the only backtest I trust</h3>
+            <p class="text-[13.5px] text-mute leading-relaxed mb-6" data-i18n="a2_d">Classic cross-validation leaks future information in financial time series. A practical guide to expanding-window validation that won't flatter your model.</p>
+            <span class="mt-auto font-mono text-xs text-accent-bright" data-i18n="a_read2">Read on Substack <span class="inline-block group-hover:translate-x-1 transition-transform duration-300">→</span></span>
+          </a>
+          <a href="https://substack.com/@nachopinazo" target="_blank" rel="noopener" class="group rounded-lg border border-edge bg-surface p-7 card-hover reveal flex flex-col" style="transition-delay:.16s">
+            <p class="font-mono text-[11px] text-faint mb-4"><span data-i18n="a3_date">March 2026</span> · <span data-i18n="a3_time">6 min</span></p>
+            <h3 class="font-bold leading-snug mb-3 group-hover:text-accent-bright transition-colors duration-300" data-i18n="a3_t">Modeling slippage without an order book: the Amihud ratio</h3>
+            <p class="text-[13.5px] text-mute leading-relaxed mb-6" data-i18n="a3_d">You don't need L2 data to price market impact. Calibrating a daily cost model (~3 bps mean, 30 bps cap) from public OHLCV alone.</p>
+            <span class="mt-auto font-mono text-xs text-accent-bright" data-i18n="a_read3">Read on Substack <span class="inline-block group-hover:translate-x-1 transition-transform duration-300">→</span></span>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= CONTACT ================= -->
+    <section id="contact" class="relative py-24 sm:py-32 border-t border-edge scroll-mt-16 overflow-hidden" aria-labelledby="contact-title">
+      <div class="absolute inset-0 hero-glow pointer-events-none" aria-hidden="true"></div>
+      <div class="relative max-w-wrap mx-auto px-5 sm:px-8 text-center">
+        <p class="font-mono text-xs text-accent-bright mb-5 reveal"><span class="text-faint">04 //</span> <span data-i18n="ct_label">CONTACT</span></p>
+        <h2 id="contact-title" class="text-3xl sm:text-5xl font-bold tracking-tight mb-5 reveal" style="transition-delay:.06s" data-i18n="ct_title">Let's talk signal.</h2>
+        <p class="text-mute max-w-xl mx-auto leading-relaxed mb-10 reveal" style="transition-delay:.12s" data-i18n="ct_sub">
+          Looking for quant research, trading technology or ML internship opportunities — and always up for a conversation about markets and models.
+        </p>
+        <div class="flex flex-wrap justify-center items-center gap-3.5 reveal" style="transition-delay:.18s">
+          <a href="mailto:ignacio.po.ipo@gmail.com" class="btn-primary inline-flex items-center gap-2 bg-accent text-ink font-semibold text-sm rounded-md px-6 py-3.5 font-mono">ignacio.po.ipo@gmail.com</a>
+          <a href="./IgnacioPinazoCV_ENG.pdf" target="_blank" rel="noopener" class="btn-ghost inline-flex items-center gap-2 border border-edge text-zinc-200 font-medium text-sm rounded-md px-6 py-3.5" data-i18n="ct_cv">Download CV</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- ================= FOOTER ================= -->
+  <footer class="border-t border-edge bg-surface/50">
+    <div class="max-w-wrap mx-auto px-5 sm:px-8 py-10 flex flex-col sm:flex-row items-center justify-between gap-6">
+      <p class="font-mono text-[11.5px] text-faint">
+        <span class="text-accent-bright">ignacio@valencia</span>:~$ <span data-i18n="ft_line">uptime — building since 2022</span> <span class="term-cursor !h-[0.85em] !w-[0.45em]" aria-hidden="true"></span>
+      </p>
+      <nav class="flex items-center gap-6 font-mono text-xs text-mute" aria-label="Social links">
+        <a href="https://github.com/Fisjo" target="_blank" rel="noopener" class="hover:text-accent-bright transition-colors duration-300">GitHub</a>
+        <a href="https://www.linkedin.com/in/ignacio-pinazo-orihuela-143539288/" target="_blank" rel="noopener" class="hover:text-accent-bright transition-colors duration-300">LinkedIn</a>
+        <a href="https://substack.com/@nachopinazo" target="_blank" rel="noopener" class="hover:text-accent-bright transition-colors duration-300">Substack</a>
+      </nav>
+      <p class="font-mono text-[11.5px] text-faint">© 2026 Ignacio Pinazo · Valencia, ES</p>
+    </div>
+  </footer>
+
+  <noscript>
+    <div style="position:fixed;bottom:0;left:0;right:0;background:#0a0a0a;border-top:1px solid #1c1f1d;color:#a1a1aa;font-family:monospace;font-size:12px;padding:10px 16px;text-align:center;">
+      JavaScript is disabled — charts and language switching are unavailable, but all content above remains readable.
+    </div>
+  </noscript>
+
+  <script>
+    'use strict';
+
+    /* =====================================================
+       I18N — instant EN/ES switching via data-i18n attributes
+       ===================================================== */
+    const translations = {
+      en: {
+        nav_research: 'Research', nav_projects: 'Projects', nav_writing: 'Writing', nav_contact: 'Contact', nav_cv: 'CV ↓',
+        hero_status: 'OPEN TO QUANT / ML OPPORTUNITIES — 2026',
+        hero_h1a: 'Engineering', hero_h1b: 'Alpha',
+        hero_h1c: 'Where machine learning meets quantitative finance.',
+        hero_sub: 'Computer Science engineer at Universitat Politècnica de València (UPV), specialized in AI applied to financial markets. I build end-to-end systematic strategies: data pipelines, supervised ranking models and statistically validated backtests.',
+        hero_cta_gh: 'View projects', hero_cta_ss: 'Read research',
+        hero_term_note: '// real metrics — bachelor thesis, walk-forward backtest 2016–2024',
+        res_label: 'FEATURED RESEARCH — BACHELOR THESIS (UPV)',
+        res_title: 'An ML stock-picking engine for the S&amp;P 500.',
+        res_sub: 'A supervised cross-sectional ranking system: XGBoost trained on liquidity, volatility and reversal signals to identify relative outperformers — audited under a realistic transaction-cost model.',
+        res_pipe_title: '// Validation pipeline',
+        pipe1_t: 'Data Ingestion', pipe1_d: '505 S&amp;P 500 tickers · 20 years of OHLCV · automated cleaning, gap repair &amp; survivorship checks.',
+        pipe2_t: 'Feature Engineering', pipe2_d: 'Vectorized feature store: Amihud illiquidity, Garman-Klass &amp; idiosyncratic volatility, short-term reversal, momentum, VIX regime. No-leakage verified.',
+        pipe3_t: 'Walk-Forward Training', pipe3_d: 'GPU XGBoost vs Ridge baseline · Optuna tuning on IC-IR · expanding window, 9 folds with 5-day purge &amp; embargo.',
+        pipe4_t: 'Backtesting Engine', pipe4_d: '7 incremental portfolio constructions (S0→S6) · dollar-neutral · Amihud-calibrated slippage + commissions · 2,269 trading days.',
+        pipe5_t: 'Statistical Validation', pipe5_d: '10,000-sample bootstrap (95% CI &gt; 0) · permutation test (p = 0.000) · cost &amp; parameter sensitivity · sub-period stability.',
+        chart_title: 'Net cumulative performance — strategy S6 vs S&amp;P 500',
+        chart_period: '2016 – 2024 · net of transaction costs',
+        chart_tab_eq: 'Equity curve', chart_tab_dd: 'Drawdown',
+        chart_foot: '* Illustrative monthly reconstruction anchored to the thesis backtest results (net Sharpe 0.81 · +17.2% ann. · max DD −34.3%). Full methodology in the thesis.',
+        m1_l: 'Net Sharpe', m1_d: '1.43 gross — survives a realistic cost model',
+        m2_l: 'Ann. net return', m2_d: 'vs +14.6% for the S&amp;P 500 over the same period',
+        m3_l: 'Permutation test', m3_d: '200 permutations — no random ranking matches the signal',
+        m4_l: 'Signal quality', m4_d: 'IC-IR over the linear baseline (t-stat 3.92, 1.1M predictions)',
+        res_cta_t: 'Explore the full system', res_cta_d: 'Notebooks, feature store and backtesting engine on GitHub',
+        prj_label: 'PROJECTS &amp; QUANT CODE', prj_title: 'Systems, not scripts.',
+        p1_tag: 'Machine Learning · Thesis', p1_t: 'ML Stock-Picking Engine — S&amp;P 500',
+        p1_d: 'End-to-end pipeline: automated ingestion of 20 years of data, a vectorized feature store of microstructure signals, XGBoost ranking under walk-forward validation with purge &amp; embargo, and a cost-aware backtesting engine selecting among 7 portfolio constructions.',
+        p1_m1l: 'Sharpe (net)', p1_m2l: 'Dataset', p1_m3l: 'Avg. cost',
+        p2_tag: '// Status', p2_deg: 'CS Engineering, UPV', p2_focus: 'AI × Quant Finance', p2_exp: 'EY — Quant Services', p2_status: 'open_to_work', p2_cta: '→ get in touch',
+        p3_tag: 'Algorithmic Trading', p3_t: 'Multi-Asset Momentum Strategy',
+        p3_d: 'Long-only and market-neutral cross-sectional momentum with monthly rebalancing. Performance audited with Sharpe, Sortino and Calmar ratios against an SPY benchmark.',
+        p4_tag: 'Research Group', p4_t: 'UPV Investment Club — Software Group',
+        p4_d: 'Developing algorithmic trading strategies and backtesting tooling, studying risk-management models and competing in international quantitative finance competitions.',
+        stack_l: '// Arsenal', stack_d: 'Backtesting · Derivatives · Portfolio Optimization · Linux · Git',
+        wr_label: 'ALPHA INSIGHTS — RESEARCH NOTES', wr_title: 'I write about what I build.', wr_cta: 'Subscribe on Substack',
+        a1_date: 'May 2026', a1_time: '8 min',
+        a1_t: "Turnover kills retail quant strategies — here's the math",
+        a1_d: 'Seven portfolio constructions, one lesson: every strategy with turnover above 1.2 died after costs. How EWMA smoothing turned a −0.05 Sharpe into +0.34.',
+        a2_date: 'April 2026', a2_time: '11 min',
+        a2_t: 'Walk-forward with purge &amp; embargo: the only backtest I trust',
+        a2_d: "Classic cross-validation leaks future information in financial time series. A practical guide to expanding-window validation that won't flatter your model.",
+        a3_date: 'March 2026', a3_time: '6 min',
+        a3_t: 'Modeling slippage without an order book: the Amihud ratio',
+        a3_d: "You don't need L2 data to price market impact. Calibrating a daily cost model (~3 bps mean, 30 bps cap) from public OHLCV alone.",
+        a_read: 'Read on Substack <span class="inline-block group-hover:translate-x-1 transition-transform duration-300">→</span>',
+        a_read2: 'Read on Substack <span class="inline-block group-hover:translate-x-1 transition-transform duration-300">→</span>',
+        a_read3: 'Read on Substack <span class="inline-block group-hover:translate-x-1 transition-transform duration-300">→</span>',
+        ct_label: 'CONTACT', ct_title: "Let's talk signal.",
+        ct_sub: 'Looking for quant research, trading technology or ML internship opportunities — and always up for a conversation about markets and models.',
+        ct_cv: 'Download CV',
+        ft_line: 'uptime — building since 2022',
+        chart_s6: 'Strategy S6 (net)', chart_spx: 'S&P 500', chart_dd_label: 'Drawdown S6 (net)',
+        term_lines: [
+          '$ python backtest.py --strategy S6 --net-of-costs',
+          '<span class="text-zinc-500">&gt; loading feature store… <span class="text-zinc-300">1,103,511 rows · 501 tickers</span></span>',
+          '<span class="text-zinc-500">&gt; walk-forward folds: <span class="text-zinc-300">9</span>  [purge=5d, embargo=on]</span>',
+          '<span class="text-zinc-500">&gt; simulating <span class="text-zinc-300">2,269</span> trading days (2016–2024)…</span>',
+          ' ',
+          '  net_sharpe        <span class="text-emerald-400 font-bold">0.81</span>',
+          '  ann_return_net    <span class="text-emerald-400 font-bold">+17.2%</span>   <span class="text-zinc-500">(S&amp;P 500: +14.6%)</span>',
+          '  max_drawdown      <span class="text-zinc-300">−34.3%</span>',
+          '  permutation_p     <span class="text-emerald-400 font-bold">0.000</span>    <span class="text-zinc-500">bootstrap 95% CI &gt; 0</span>',
+          ' ',
+          '<span class="text-emerald-400">[DONE]</span> <span class="text-zinc-500">alpha is engineered, not found.</span>'
+        ]
+      },
+      es: {
+        nav_research: 'Research', nav_projects: 'Proyectos', nav_writing: 'Artículos', nav_contact: 'Contacto', nav_cv: 'CV ↓',
+        hero_status: 'ABIERTO A OPORTUNIDADES QUANT / ML — 2026',
+        hero_h1a: 'Ingeniería de', hero_h1b: 'Alpha',
+        hero_h1c: 'Donde el machine learning se encuentra con las finanzas cuantitativas.',
+        hero_sub: 'Ingeniero informático en la Universitat Politècnica de València (UPV), especializado en IA aplicada a mercados financieros. Construyo estrategias sistemáticas end-to-end: pipelines de datos, modelos de ranking supervisado y backtests validados estadísticamente.',
+        hero_cta_gh: 'Ver proyectos', hero_cta_ss: 'Leer research',
+        hero_term_note: '// métricas reales — TFG, backtest walk-forward 2016–2024',
+        res_label: 'RESEARCH DESTACADO — TRABAJO FIN DE GRADO (UPV)',
+        res_title: 'Un motor de stock picking con ML para el S&amp;P 500.',
+        res_sub: 'Un sistema de ranking cross-sectional supervisado: XGBoost entrenado con señales de liquidez, volatilidad y reversión para identificar activos que baten al mercado — auditado bajo un modelo realista de costes de transacción.',
+        res_pipe_title: '// Pipeline de validación',
+        pipe1_t: 'Ingesta de datos', pipe1_d: '505 tickers del S&amp;P 500 · 20 años de OHLCV · limpieza automatizada, reparación de huecos y controles de supervivencia.',
+        pipe2_t: 'Ingeniería de features', pipe2_d: 'Feature store vectorizado: iliquidez de Amihud, volatilidad Garman-Klass e idiosincrática, reversión a corto plazo, momentum, régimen del VIX. Verificación de no-leakage.',
+        pipe3_t: 'Entrenamiento walk-forward', pipe3_d: 'XGBoost en GPU vs baseline Ridge · optimización con Optuna sobre IC-IR · ventana expansiva, 9 folds con purge de 5 días y embargo.',
+        pipe4_t: 'Motor de backtesting', pipe4_d: '7 construcciones incrementales de cartera (S0→S6) · dollar-neutral · slippage calibrado con Amihud + comisiones · 2.269 días de cotización.',
+        pipe5_t: 'Validación estadística', pipe5_d: 'Bootstrap de 10.000 muestras (IC 95% &gt; 0) · test de permutación (p = 0,000) · sensibilidad a costes y parámetros · estabilidad por sub-períodos.',
+        chart_title: 'Rendimiento acumulado neto — estrategia S6 vs S&amp;P 500',
+        chart_period: '2016 – 2024 · neto de costes de transacción',
+        chart_tab_eq: 'Equity curve', chart_tab_dd: 'Drawdown',
+        chart_foot: '* Reconstrucción mensual ilustrativa anclada a los resultados del backtest del TFG (Sharpe neto 0,81 · +17,2% anual · max DD −34,3%). Metodología completa en la memoria.',
+        m1_l: 'Sharpe neto', m1_d: '1,43 bruto — sobrevive a un modelo realista de costes',
+        m2_l: 'Retorno anual neto', m2_d: 'frente al +14,6% del S&amp;P 500 en el mismo período',
+        m3_l: 'Test de permutación', m3_d: '200 permutaciones — ningún ranking aleatorio iguala la señal',
+        m4_l: 'Calidad de señal', m4_d: 'IC-IR sobre el baseline lineal (t-stat 3,92, 1,1M predicciones)',
+        res_cta_t: 'Explora el sistema completo', res_cta_d: 'Notebooks, feature store y motor de backtesting en GitHub',
+        prj_label: 'PROYECTOS &amp; CÓDIGO QUANT', prj_title: 'Sistemas, no scripts.',
+        p1_tag: 'Machine Learning · TFG', p1_t: 'Motor de Stock Picking con ML — S&amp;P 500',
+        p1_d: 'Pipeline end-to-end: ingesta automatizada de 20 años de datos, feature store vectorizado de señales de microestructura, ranking con XGBoost bajo validación walk-forward con purge y embargo, y un motor de backtesting con costes que selecciona entre 7 construcciones de cartera.',
+        p1_m1l: 'Sharpe (neto)', p1_m2l: 'Dataset', p1_m3l: 'Coste medio',
+        p2_tag: '// Estado', p2_deg: 'Ing. Informática, UPV', p2_focus: 'IA × Finanzas Quant', p2_exp: 'EY — Servicios Quant', p2_status: 'open_to_work', p2_cta: '→ hablemos',
+        p3_tag: 'Trading Algorítmico', p3_t: 'Estrategia Momentum Multi-Activo',
+        p3_d: 'Momentum cross-sectional long-only y market-neutral con rebalanceo mensual. Rendimiento auditado con ratios Sharpe, Sortino y Calmar frente al benchmark SPY.',
+        p4_tag: 'Grupo de Investigación', p4_t: 'Club de Inversión UPV — Grupo de Software',
+        p4_d: 'Desarrollo de estrategias de trading algorítmico y herramientas de backtesting, estudio de modelos de gestión de riesgo y participación en competiciones internacionales de finanzas cuantitativas.',
+        stack_l: '// Arsenal', stack_d: 'Backtesting · Derivados · Optimización de Carteras · Linux · Git',
+        wr_label: 'ALPHA INSIGHTS — NOTAS DE RESEARCH', wr_title: 'Escribo sobre lo que construyo.', wr_cta: 'Suscríbete en Substack',
+        a1_date: 'Mayo 2026', a1_time: '8 min',
+        a1_t: 'El turnover mata las estrategias quant retail — aquí están los números',
+        a1_d: 'Siete construcciones de cartera, una lección: toda estrategia con turnover superior a 1,2 murió tras costes. Cómo el suavizado EWMA convirtió un Sharpe de −0,05 en +0,34.',
+        a2_date: 'Abril 2026', a2_time: '11 min',
+        a2_t: 'Walk-forward con purge y embargo: el único backtest en el que confío',
+        a2_d: 'La validación cruzada clásica filtra información futura en series temporales financieras. Una guía práctica de validación con ventana expansiva que no infla tu modelo.',
+        a3_date: 'Marzo 2026', a3_time: '6 min',
+        a3_t: 'Modelar slippage sin order book: el ratio de Amihud',
+        a3_d: 'No necesitas datos L2 para estimar el impacto de mercado. Calibrando un modelo de costes diario (~3 bps de media, tope de 30 bps) solo con OHLCV público.',
+        a_read: 'Leer en Substack <span class="inline-block group-hover:translate-x-1 transition-transform duration-300">→</span>',
+        a_read2: 'Leer en Substack <span class="inline-block group-hover:translate-x-1 transition-transform duration-300">→</span>',
+        a_read3: 'Leer en Substack <span class="inline-block group-hover:translate-x-1 transition-transform duration-300">→</span>',
+        ct_label: 'CONTACTO', ct_title: 'Hablemos de señal.',
+        ct_sub: 'Busco oportunidades en quant research, tecnología de trading o prácticas en ML — y siempre disponible para una conversación sobre mercados y modelos.',
+        ct_cv: 'Descargar CV',
+        ft_line: 'uptime — construyendo desde 2022',
+        chart_s6: 'Estrategia S6 (neto)', chart_spx: 'S&P 500', chart_dd_label: 'Drawdown S6 (neto)',
+        term_lines: [
+          '$ python backtest.py --strategy S6 --net-of-costs',
+          '<span class="text-zinc-500">&gt; cargando feature store… <span class="text-zinc-300">1.103.511 filas · 501 tickers</span></span>',
+          '<span class="text-zinc-500">&gt; folds walk-forward: <span class="text-zinc-300">9</span>  [purge=5d, embargo=on]</span>',
+          '<span class="text-zinc-500">&gt; simulando <span class="text-zinc-300">2.269</span> días de cotización (2016–2024)…</span>',
+          ' ',
+          '  sharpe_neto       <span class="text-emerald-400 font-bold">0,81</span>',
+          '  retorno_anual     <span class="text-emerald-400 font-bold">+17,2%</span>   <span class="text-zinc-500">(S&amp;P 500: +14,6%)</span>',
+          '  max_drawdown      <span class="text-zinc-300">−34,3%</span>',
+          '  p_permutación     <span class="text-emerald-400 font-bold">0,000</span>    <span class="text-zinc-500">bootstrap IC 95% &gt; 0</span>',
+          ' ',
+          '<span class="text-emerald-400">[DONE]</span> <span class="text-zinc-500">el alpha se ingenia, no se encuentra.</span>'
+        ]
+      }
+    };
+
+    let currentLang = localStorage.getItem('lang') || 'en';
+
+    function applyTranslations(lang) {
+      const dict = translations[lang];
+      document.querySelectorAll('[data-i18n]').forEach(el => {
+        const key = el.dataset.i18n;
+        if (dict[key] != null) el.innerHTML = dict[key];
+      });
+      document.documentElement.lang = lang;
+      document.getElementById('lang-en').setAttribute('aria-pressed', String(lang === 'en'));
+      document.getElementById('lang-es').setAttribute('aria-pressed', String(lang === 'es'));
+    }
+
+    function setLang(lang) {
+      if (lang === currentLang) return;
+      currentLang = lang;
+      localStorage.setItem('lang', lang);
+      applyTranslations(lang);
+      renderTerminal(true);   // re-render instantly, no replay
+      updateChartLang();
+      buildTicker();
+    }
+
+    /* =====================================================
+       TERMINAL — typewriter readout of real thesis metrics
+       ===================================================== */
+    const termEl = document.getElementById('terminal');
+    let termPlayed = false;
+    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    function renderTerminal(instant) {
+      const lines = translations[currentLang].term_lines;
+      if (instant || termPlayed || reducedMotion) {
+        termEl.innerHTML = lines.join('\n') + ' <span class="term-cursor"></span>';
+        termPlayed = true;
+        return;
+      }
+      termPlayed = true;
+      termEl.innerHTML = '';
+      let i = 0;
+      const step = () => {
+        if (i >= lines.length) {
+          termEl.innerHTML += ' <span class="term-cursor"></span>';
+          return;
+        }
+        termEl.innerHTML = lines.slice(0, i + 1).join('\n');
+        i++;
+        setTimeout(step, i === 1 ? 420 : 170);
+      };
+      step();
+    }
+
+    /* =====================================================
+       TICKER — ambient strip of thesis facts
+       ===================================================== */
+    const tickerItems = {
+      en: ['NET_SHARPE 0.81 ▲', 'ANN_RET +17.2%', 'BENCH S&P500 +14.6%', 'MAX_DD −34.3%', 'TURNOVER 0.53', 'AVG_COST 5.1bps', 'BOOTSTRAP_CI95 > 0', 'PERM_P 0.000', 'FOLDS 9 [WF+PURGE]', 'ROWS 1,103,511', 'UNIVERSE SP500·501', 'IC_TSTAT 3.92'],
+      es: ['SHARPE_NETO 0,81 ▲', 'RET_ANUAL +17,2%', 'BENCH S&P500 +14,6%', 'MAX_DD −34,3%', 'TURNOVER 0,53', 'COSTE_MEDIO 5,1bps', 'BOOTSTRAP_IC95 > 0', 'PERM_P 0,000', 'FOLDS 9 [WF+PURGE]', 'FILAS 1.103.511', 'UNIVERSO SP500·501', 'IC_TSTAT 3,92']
+    };
+
+    function buildTicker() {
+      const items = tickerItems[currentLang];
+      const half = items.map(t => `<span class="whitespace-nowrap"><span class="text-accent-dim mr-2">◆</span>${t}</span>`).join('');
+      document.getElementById('ticker').innerHTML = half + half; // duplicated for seamless loop
+    }
+
+    /* =====================================================
+       PERFORMANCE DATA — deterministic monthly reconstruction
+       anchored to the thesis backtest (2016–2024)
+       ===================================================== */
+    function mulberry32(seed) {
+      return function () {
+        seed |= 0; seed = (seed + 0x6D2B79F5) | 0;
+        let t = Math.imul(seed ^ (seed >>> 15), 1 | seed);
+        t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+        return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+      };
+    }
+
+    function buildSeries(anchors, seed, noise) {
+      // anchors: [monthIndex, cumulativeValue]; geometric interpolation + seeded noise
+      const rand = mulberry32(seed);
+      const n = anchors[anchors.length - 1][0];
+      const out = new Array(n + 1);
+      for (let a = 0; a < anchors.length - 1; a++) {
+        const [i0, v0] = anchors[a], [i1, v1] = anchors[a + 1];
+        const r = Math.pow(v1 / v0, 1 / (i1 - i0)); // monthly growth between anchors
+        out[i0] = (a === 0) ? v0 : out[i0];
+        let v = out[i0];
+        for (let i = i0 + 1; i <= i1; i++) {
+          v *= r * (1 + (rand() - 0.5) * noise);
+          out[i] = v;
+        }
+        out[i1] = v1; // pin the anchor exactly
+      }
+      return out;
+    }
+
+    // Month 0 = Jan 2016 … month 108 = Dec 2024
+    const s6Anchors = [
+      [0, 1.00], [12, 1.20], [24, 1.50], [36, 1.57], [48, 1.92],
+      [50, 2.05],            // Feb 2020 peak
+      [51, 1.347],           // Mar 2020 trough  →  −34.3% drawdown
+      [60, 2.30], [72, 2.95], [84, 2.71], [96, 3.42], [108, 4.17] // ≈ (1.172)^9
+    ];
+    const spxAnchors = [
+      [0, 1.00], [12, 1.12], [24, 1.34], [36, 1.28], [48, 1.65],
+      [50, 1.72], [51, 1.38],
+      [60, 1.95], [72, 2.48], [84, 2.03], [96, 2.56], [108, 3.41] // ≈ (1.146)^9
+    ];
+
+    const s6Series = buildSeries(s6Anchors, 42, 0.045);
+    const spxSeries = buildSeries(spxAnchors, 7, 0.035);
+
+    const monthLabels = [];
+    for (let y = 2016; y <= 2024; y++) for (let m = 0; m < 12; m++) monthLabels.push(`${y}-${String(m + 1).padStart(2, '0')}`);
+    monthLabels.push('2025-01');
+
+    function drawdown(series) {
+      let peak = -Infinity;
+      return series.map(v => { peak = Math.max(peak, v); return (v / peak - 1) * 100; });
+    }
+    const s6DD = drawdown(s6Series);
+
+    /* =====================================================
+       CHART.JS — themed equity / drawdown chart
+       ===================================================== */
+    let chart = null;
+    let chartMode = 'equity';
+
+    const C = { green: '#10b981', greenBright: '#34d399', grid: 'rgba(63,63,70,.22)', tick: '#52525b', white: 'rgba(228,228,231,.85)' };
+
+    function baseOptions(yFmt) {
+      return {
+        responsive: true,
+        maintainAspectRatio: false,
+        interaction: { mode: 'index', intersect: false },
+        plugins: {
+          legend: { labels: { color: C.white, font: { family: '"JetBrains Mono", monospace', size: 11 }, boxWidth: 22, boxHeight: 2, usePointStyle: false } },
+          tooltip: {
+            backgroundColor: '#0d0f0e', borderColor: '#1c1f1d', borderWidth: 1,
+            titleColor: '#a1a1aa', bodyColor: '#e4e4e7', padding: 12,
+            titleFont: { family: '"JetBrains Mono", monospace', size: 11 },
+            bodyFont: { family: '"JetBrains Mono", monospace', size: 12 },
+            callbacks: { label: ctx => ` ${ctx.dataset.label}: ${yFmt(ctx.parsed.y)}` }
+          }
+        },
+        scales: {
+          x: {
+            grid: { color: C.grid }, border: { color: '#1c1f1d' },
+            ticks: { color: C.tick, font: { family: '"JetBrains Mono", monospace', size: 10 }, maxTicksLimit: 10, callback: function (v) { const l = this.getLabelForValue(v); return l.endsWith('-01') ? l.slice(0, 4) : null; } }
+          },
+          y: {
+            grid: { color: C.grid }, border: { color: '#1c1f1d' },
+            ticks: { color: C.tick, font: { family: '"JetBrains Mono", monospace', size: 10 }, callback: v => yFmt(v) }
+          }
+        }
+      };
+    }
+
+    function equityConfig() {
+      const dict = translations[currentLang];
+      return {
+        type: 'line',
+        data: {
+          labels: monthLabels,
+          datasets: [
+            {
+              label: dict.chart_s6, data: s6Series, borderColor: C.greenBright, borderWidth: 2,
+              pointRadius: 0, pointHoverRadius: 4, pointHoverBackgroundColor: '#00ff88', tension: .25, fill: true,
+              backgroundColor: (ctx) => {
+                const g = ctx.chart.ctx.createLinearGradient(0, 0, 0, ctx.chart.height);
+                g.addColorStop(0, 'rgba(16,185,129,.22)'); g.addColorStop(1, 'rgba(16,185,129,0)');
+                return g;
+              }
+            },
+            { label: dict.chart_spx, data: spxSeries, borderColor: 'rgba(161,161,170,.65)', borderWidth: 1.5, borderDash: [5, 5], pointRadius: 0, pointHoverRadius: 4, tension: .25, fill: false }
+          ]
+        },
+        options: baseOptions(v => `${Number(v).toFixed(2)}x`)
+      };
+    }
+
+    function ddConfig() {
+      const dict = translations[currentLang];
+      return {
+        type: 'line',
+        data: {
+          labels: monthLabels,
+          datasets: [{
+            label: dict.chart_dd_label, data: s6DD, borderColor: C.greenBright, borderWidth: 1.8,
+            pointRadius: 0, pointHoverRadius: 4, tension: .2, fill: true,
+            backgroundColor: 'rgba(16,185,129,.14)'
+          }]
+        },
+        options: baseOptions(v => `${Number(v).toFixed(0)}%`)
+      };
+    }
+
+    function showChart(mode) {
+      chartMode = mode;
+      const eqBtn = document.getElementById('tab-equity'), ddBtn = document.getElementById('tab-dd');
+      const on = ['bg-accent/10', 'text-accent-bright'], off = ['text-faint'];
+      [eqBtn, ddBtn].forEach(b => { b.classList.remove(...on, ...off); });
+      (mode === 'equity' ? eqBtn : ddBtn).classList.add(...on);
+      (mode === 'equity' ? ddBtn : eqBtn).classList.add(...off);
+      eqBtn.setAttribute('aria-selected', String(mode === 'equity'));
+      ddBtn.setAttribute('aria-selected', String(mode === 'dd'));
+      if (chart) chart.destroy();
+      chart = new Chart(document.getElementById('perfChart'), mode === 'equity' ? equityConfig() : ddConfig());
+    }
+
+    function updateChartLang() { showChart(chartMode); }
+
+    /* =====================================================
+       SCROLL REVEAL
+       ===================================================== */
+    const observer = new IntersectionObserver(entries => {
+      entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); observer.unobserve(e.target); } });
+    }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+
+    /* =====================================================
+       INIT
+       ===================================================== */
+    document.addEventListener('DOMContentLoaded', () => {
+      applyTranslations(currentLang);
+      buildTicker();
+      renderTerminal(false);
+      showChart('equity');
+      document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+    });
+  </script>
+</body>
+</html>
