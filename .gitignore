@@ -1,3 +1,8 @@
+# Local-only: nested clone of the deploy repo, raw thesis extract, local tooling
+ignaciopinazo.github.io/
+tfg_extracted.txt
+.claude/
+
 # Logs
 logs
 *.log
